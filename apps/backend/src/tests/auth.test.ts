@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'test';
+
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
 import mongoose from 'mongoose';
@@ -41,7 +43,7 @@ describe('Phase 1: Backend Auth & Healthcheck API Integration Tests', () => {
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('ok');
     expect(res.body).toHaveProperty('timestamp');
-  }, 10000);
+  });
 
   it('2. POST /api/auth/register - should create a new user and set HttpOnly cookies', async () => {
     const res = await request(app).post('/api/auth/register').send(testUser);
@@ -61,7 +63,7 @@ describe('Phase 1: Backend Auth & Healthcheck API Integration Tests', () => {
       authCookie = cookieArray.find((c: string) => c.startsWith('accessToken=')) || '';
       expect(authCookie).toContain('HttpOnly');
     }
-  }, 15000);
+  });
 
   it('3. POST /api/auth/register - should fail on duplicate email', async () => {
     const res = await request(app).post('/api/auth/register').send(testUser);
@@ -69,7 +71,7 @@ describe('Phase 1: Backend Auth & Healthcheck API Integration Tests', () => {
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
     expect(res.body.error).toContain('đã được sử dụng');
-  }, 10000);
+  });
 
   it('4. POST /api/auth/login - should authenticate user and return token', async () => {
     const res = await request(app).post('/api/auth/login').send({
@@ -80,7 +82,7 @@ describe('Phase 1: Backend Auth & Healthcheck API Integration Tests', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.user.email).toBe(testUser.email.toLowerCase());
-  }, 10000);
+  });
 
   it('5. POST /api/auth/login - should fail with wrong password', async () => {
     const res = await request(app).post('/api/auth/login').send({
@@ -90,7 +92,7 @@ describe('Phase 1: Backend Auth & Healthcheck API Integration Tests', () => {
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
-  }, 10000);
+  });
 
   it('6. GET /api/auth/me - should return user profile when authenticated', async () => {
     const res = await request(app)
@@ -100,19 +102,19 @@ describe('Phase 1: Backend Auth & Healthcheck API Integration Tests', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.user.name).toBe(testUser.name);
-  }, 10000);
+  });
 
   it('7. GET /api/auth/me - should return 401 when unauthenticated', async () => {
     const res = await request(app).get('/api/auth/me');
 
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
-  }, 10000);
+  });
 
   it('8. POST /api/auth/logout - should clear auth cookies', async () => {
     const res = await request(app).post('/api/auth/logout');
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-  }, 10000);
+  });
 });
