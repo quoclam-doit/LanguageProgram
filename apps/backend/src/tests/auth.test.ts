@@ -45,10 +45,11 @@ describe('Phase 1: Backend Auth & Healthcheck API Integration Tests', () => {
     expect(res.body.data.user.streak.current).toBe(0);
 
     // Verify HttpOnly cookie header exists
-    const cookies = res.headers['set-cookie'];
-    expect(cookies).toBeDefined();
-    if (cookies) {
-      authCookie = cookies.find((c: string) => c.startsWith('accessToken=')) || '';
+    const rawCookies = res.headers['set-cookie'];
+    expect(rawCookies).toBeDefined();
+    if (rawCookies) {
+      const cookieArray = Array.isArray(rawCookies) ? rawCookies : [rawCookies];
+      authCookie = cookieArray.find((c: string) => c.startsWith('accessToken=')) || '';
       expect(authCookie).toContain('HttpOnly');
     }
   });
