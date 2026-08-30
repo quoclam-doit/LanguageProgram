@@ -1,0 +1,40 @@
+name: CI/CD Pipeline - Language Learning App
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: Build, Lint & Test Phase 1
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.18.2
+
+      - name: Setup Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build all workspace packages (@app/shared, @app/backend, @app/frontend)
+        run: pnpm build
+
+      - name: Run Integration Tests
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI || 'mongodb+srv://lyquoclam123:lam123456@cluster0.2zprwg6.mongodb.net/english_learning_db?retryWrites=true&w=majority&appName=Cluster0' }}
+          JWT_ACCESS_SECRET: 'ci_access_secret_123456'
+          JWT_REFRESH_SECRET: 'ci_refresh_secret_123456'
+        run: pnpm test
