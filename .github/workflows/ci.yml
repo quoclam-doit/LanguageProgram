@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 10.18.2
 
@@ -34,7 +34,6 @@ jobs:
 
       - name: Run Integration Tests
         env:
-          MONGODB_URI: ${{ secrets.MONGODB_URI || 'mongodb+srv://lyquoclam123:lam123456@cluster0.2zprwg6.mongodb.net/english_learning_db?retryWrites=true&w=majority&appName=Cluster0' }}
           JWT_ACCESS_SECRET: 'ci_access_secret_123456'
           JWT_REFRESH_SECRET: 'ci_refresh_secret_123456'
         run: pnpm test
