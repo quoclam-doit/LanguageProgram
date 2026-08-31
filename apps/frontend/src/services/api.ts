@@ -1,6 +1,6 @@
 import { ApiResponse } from '@app/shared';
 
-const API_BASE = '/api';
+export const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '') + '/api';
 
 export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
   const config: RequestInit = {
@@ -13,7 +13,8 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
   };
 
   try {
-    const res = await fetch(`${API_BASE}${endpoint}`, config);
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+    const res = await fetch(url, config);
     const text = await res.text();
 
     let data: any = null;

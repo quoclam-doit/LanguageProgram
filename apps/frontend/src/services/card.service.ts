@@ -1,8 +1,11 @@
+import { API_BASE } from './api';
+
 export interface CardData {
   _id: string;
   deckId: string;
   langCode: string;
   term: string;
+  partOfSpeech?: string;
   ipa?: { us?: string; uk?: string };
   meanings: Array<{ langCode: string; text: string }>;
   examples: Array<{ en: string; vi?: string }>;
@@ -13,14 +16,25 @@ export interface CardData {
 
 export const cardService = {
   async getCardsByDeck(deckId: string): Promise<CardData[]> {
-    const res = await fetch(`/api/cards/deck/${deckId}`, { credentials: 'include' });
+    const res = await fetch(`${API_BASE}/cards/deck/${deckId}`, { credentials: 'include' });
     const json = await res.json();
     if (!json.success) throw new Error(json.error || 'Lỗi khi tải danh sách thẻ');
     return json.data;
   },
 
-  async createCard(deckId: string, data: { term: string; ipa?: { us?: string; uk?: string }; meanings: { langCode: string; text: string }[]; examples?: { en: string; vi?: string }[] }): Promise<CardData> {
-    const res = await fetch(`/api/cards/deck/${deckId}`, {
+  async createCard(
+    deckId: string,
+    data: {
+      term: string;
+      partOfSpeech?: string;
+      ipa?: { us?: string; uk?: string };
+      meanings: { langCode: string; text: string }[];
+      examples?: { en: string; vi?: string }[];
+      audioUrl?: string;
+      imageUrl?: string;
+    }
+  ): Promise<CardData> {
+    const res = await fetch(`${API_BASE}/cards/deck/${deckId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -32,7 +46,7 @@ export const cardService = {
   },
 
   async deleteCard(id: string): Promise<void> {
-    const res = await fetch(`/api/cards/${id}`, {
+    const res = await fetch(`${API_BASE}/cards/${id}`, {
       method: 'DELETE',
       credentials: 'include',
     });

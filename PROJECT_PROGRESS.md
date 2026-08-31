@@ -12,7 +12,7 @@
 | :--- | :--- | :---: | :---: |
 | **Phase 1** | Monorepo Setup, Express Backend, Auth HttpOnly Cookie, Vitest Suite & UI Anti-Slop | ✅ **Hoàn thành** | **100%** |
 | **Phase 2** | Thẻ Học Flashcard, CRUD Deck/Card, Cloudinary Upload & Thuật Toán FSRS Engine | ✅ **Hoàn thành** | **100%** |
-| **Phase 3** | Dictionary Pipeline 3 Tầng & Async Import CSV Background Queue | 🔄 **Giai đoạn tiếp theo** | **0%** |
+| **Phase 3** | Tra Phiên Âm Tự Động (2 Tầng) & Async Import CSV Background Queue | 🔄 **Đang triển khai** | **~20%** |
 | **Phase 4** | Engine Trắc Nghiệm (5 Dạng Quiz) & Gamification (XP, Streak, Level) | ⏳ **Chờ xử lý** | **0%** |
 | **Phase 5** | Admin Dashboard, UptimeRobot Ping & Production Deploy (Vercel + Render) | ⏳ **Chờ xử lý** | **0%** |
 
@@ -57,24 +57,82 @@
 
 ---
 
-### 🔄 Phase 3: Tra Từ Tự Động (Dictionary Pipeline) & Import CSV Bất Đồng Bộ (Giai đoạn tiếp theo)
-- [ ] **Global `DictionaryStore` Collection:** Cache từ vựng dùng chung toàn hệ thống (`word`, `ipa`, `meanings`, `translations`).
-- [ ] **Luồng Tra Từ 3 Tầng:** `DB Cache` $\rightarrow$ `Free Dictionary API` $\rightarrow$ `Gemini Flash LLM Fallback` $\rightarrow$ `User Nhập Thủ Công`.
-- [ ] **Async CSV Import Queue:** Backend tiếp nhận file CSV $\rightarrow$ Lưu thô trả kết quả ngay $\rightarrow$ Worker ngầm chạy bổ sung phiên âm IPA, dịch nghĩa và audio.
+### 🔄 Phase 3: Tra Phiên Âm Tự Động (Dictionary Pipeline Rút Gọn) & Import CSV Bất Đồng Bộ (Đang triển khai)
+
+> **Quyết định phạm vi (31/08/2026):** Bỏ tầng Gemini Flash LLM fallback, dời sang giai đoạn tương lai. Lý do: Free Dictionary API không trả nghĩa tiếng Việt, mà nghĩa + từ loại nay do **user tự nhập luôn** (chính xác hơn dịch máy) nên không cần LLM để dịch. Pipeline rút gọn còn **2 tầng**, chỉ tự động hoá phần **phiên âm IPA + audio** — phần khó gõ tay nhất.
+
+> **Nguồn chi tiết:** `.scratch/phase-3-dictionary-import/spec.md` + `issues/01-04-*.md` (quy trình `/to-spec` → `/to-tickets` → `/implement`). Bảng dưới dùng để **giao việc frontend** — cập nhật ngay sau mỗi ticket backend xong.
+
+#### 🎯 Bảng giao việc Frontend (xem trước khi phân công)
+
+| Ticket BE | Nội dung | Trạng thái BE | → Mở khóa việc gì cho FE | Giao FE được chưa? |
+|:---:|---|:---:|---|:---:|
+| — | *(không phụ thuộc ticket nào)* | — | Absolute API URL (`VITE_API_BASE_URL`), chuẩn bị file CSV mẫu | ✅ **Giao ngay được** |
+| 01 | `partOfSpeech` bắt buộc trên Card | ✅ Done *(chưa commit)* | *(đã tự vá tạm trong `DeckDetail.tsx` — FE không cần làm gì thêm)* | ✅ Xong, khỏi giao |
+| 02 | Dictionary lookup 2 tầng | ✅ Done *(chưa commit)* | Nút "Tra phiên âm tự động" cạnh ô nhập từ — endpoint `GET /api/dictionary/lookup?word=` đã sẵn sàng | ✅ **Giao được rồi** |
+| 03 | Import CSV tạo thẻ ngay | ⬜ Chưa làm *(chờ 01 ✅ → sẵn sàng bắt đầu)* | Modal Import CSV (chưa cần progress bar) | 🔒 Chờ ticket 03 |
+| 04 | Worker enrich nền + progress | ⬜ Chưa làm *(chờ 02, 03)* | Progress bar trong modal Import CSV | 🔒 Chờ ticket 04 |
+
+**Đã commit chưa?** Chưa — mọi thay đổi ticket 01 vẫn ở working tree local trên `main`. FE team sẽ không thấy gì cho tới khi commit/push.
+
+---
+
+**Backend:**
+- [x] `[Ticket 01]` Thêm field `partOfSpeech` vào `CardMeaning` (`packages/shared/src/index.ts`) + `Card` model (`Card.ts`) + cập nhật `createCardSchema`/`updateCardSchema` trong `card.controller.ts` (bắt buộc nhập). *(done, 17/17 test pass, chưa commit)*
+- [x] `[Ticket 02]` `dictionary.service.ts`: hàm `lookupPhonetic(word)` chạy 2 tầng — (1) query `DictionaryStore` theo `word`; (2) nếu chưa có, gọi Free Dictionary API (`api.dictionaryapi.dev`) lấy `ipa.us/uk` + `audioUrl`, cache lại vào `DictionaryStore` (`source: 'dictionary_api'`). Nếu API không có từ → trả rỗng, không lỗi, không bắt buộc. *(done, 22/22 test pass, chưa commit)*
+- [x] `[Ticket 02]` `dictionary.controller.ts` + `dictionary.routes.ts`: `GET /api/dictionary/lookup?word=...`, đăng ký route trong `server.ts`. *(done, chưa commit)*
+- [ ] `[Ticket 03]` Model `ImportJob` mới: `deckId`, `ownerId`, `status: 'pending'|'processing'|'completed'|'failed'`, `totalRows`, `processedRows`, `errors[]`, `createdAt`.
+- [ ] `[Ticket 03]` Middleware upload CSV (`multer`, giới hạn size/mime `.csv`).
+- [ ] `[Ticket 03]` `import.controller.ts`: `POST /api/decks/:deckId/import-csv` — parse CSV (cột bắt buộc: `term`, `meaning`, `partOfSpeech`; cột tuỳ chọn: `exampleEn`, `exampleVi`) → tạo `Card` ngay lập tức → tạo `ImportJob(status='pending')` → trả response ngay, không block.
+- [ ] `[Ticket 04]` `importWorker.service.ts`: chạy nền, với mỗi Card mới import gọi `dictionary.service.lookupPhonetic()` bổ sung IPA + audioUrl, cập nhật `processedRows`, set `status='completed'` khi xong.
+- [ ] `[Ticket 04]` `GET /api/decks/:deckId/import-jobs/:jobId`: polling endpoint theo dõi tiến độ import.
+- [ ] `[Ticket 02-04]` Vitest tests: lookup phiên âm (mock Free Dictionary API), luồng CSV import tạo đúng số Card + job hoàn tất đúng trạng thái.
+
+**Frontend:**
+- [x] `[Ticket 01]` Thêm field "Từ loại" (dropdown: danh từ/động từ/tính từ/trạng từ/...) vào form Thêm Từ Vựng ở `DeckDetail.tsx`, bắt buộc nhập. *(fix kèm theo Ticket 01 backend, để không vỡ UI — chưa commit)*
+- [x] **Absolute API URL cho production**: thêm biến `VITE_API_BASE_URL`, cập nhật `api.ts`, `deck.service.ts`, `card.service.ts`, `srs.service.ts` dùng biến này thay vì path tương đối cứng (`/api/...`).
+- [x] Cung cấp file CSV mẫu (`oxford_flashcard_template.csv`) với hàm `downloadCsvTemplate()` trong `csvTemplate.service.ts` + nút tải trực tiếp trên UI.
+- [x] `dictionary.service.ts` (frontend): `lookupPhonetic(word)` tự động tra IPA + audio qua backend & fallback Free Dictionary API.
+- [x] Nút "Tra IPA" tự động + trigger `onBlur` trên input `term` trong modal Thêm thẻ ở `DeckDetail.tsx`.
+- [ ] `[🔒 chờ Ticket 03]` `import.service.ts`: `importCsv(deckId, file)` (dùng `FormData`), `getImportJobStatus(deckId, jobId)`.
+- [ ] `[🔒 chờ Ticket 03]` Modal "Import CSV" (`DeckList.tsx` hoặc `DeckDetail.tsx`): file picker → preview vài dòng đầu → validate đủ cột bắt buộc trước khi submit.
+- [ ] `[🔒 chờ Ticket 04]` Progress indicator: polling job status mỗi 2-3s, thanh progress `processedRows/totalRows`, badge trạng thái khi hoàn tất.
 
 ---
 
 ### ⏳ Phase 4: Trắc Nghiệm Phản Xạ (Quiz Module) & Gamification
-- [ ] **Discriminated Union Question Schemas:** 5 dạng bài tập (`mcq`, `fill_blank`, `matching`, `listening`, `ordering`).
-- [ ] **Quiz Engine & UI Renderer:** Bộ giao diện làm trắc nghiệm có tính giờ, nộp bài & hiển thị lời giải.
-- [ ] **Gamification Rules:** 
-  - Cộng **+10 XP** cho SRS Card / **+5 XP** cho Quiz question.
-  - Cập nhật Level: $\text{Level} = \lfloor \sqrt{\text{XP}/100} \rfloor$.
-  - Tính toán Streak hàng ngày theo múi giờ cá nhân (`timezone`).
+
+**Backend:**
+- [ ] **[Làm trước tiên] Refactor `gamification.service.ts`:** tách `awardXp(userId, amount)` và `updateStreak(user, now)` dùng chung ra khỏi `srs.controller.ts` (hiện logic XP/Streak đang nhúng cứng ở đó) + chuyển `calculateLevel()` từ `auth.controller.ts` sang service này dùng chung. Cập nhật `srs.controller.ts` gọi lại service mới, không đổi hành vi hiện tại — tránh duplicate code khi viết `quiz.controller.ts` mới.
+- [ ] Model `Quiz` + `Question` (dùng Mongoose discriminator hoặc `type` + `payload: Mixed`, khớp discriminated union đã định nghĩa sẵn trong `packages/shared/src/index.ts`) + `QuizAttempt`.
+- [ ] `quiz.service.ts`: auto-generate 5 dạng câu hỏi từ 1 deck — `mcq` (đáp án đúng + 3 distractor từ card khác cùng deck), `fill_blank` (ẩn `term` trong `examples[].en`), `matching` (ghép term↔meaning), `listening` (audio + MCQ), `ordering` (xáo từ trong câu ví dụ).
+- [ ] `quiz.controller.ts` + routes: `POST /api/quizzes/generate` (deckId, questionCount, types[]), `GET /api/quizzes/:id` (ẩn đáp án đúng), `POST /api/quizzes/:id/submit` (chấm điểm, gọi `gamification.service` cộng **+5 XP/câu đúng**).
+- [ ] Vitest tests: sinh đúng số câu/đúng loại theo yêu cầu, chấm điểm + cộng XP chính xác.
+
+**Frontend:**
+- [ ] Thêm route `/quizzes` vào `App.tsx` — hiện `Navbar.tsx` đã có link trỏ tới nhưng route chưa tồn tại (dead link).
+- [ ] `quiz.service.ts`: `generateQuiz()`, `getQuiz(id)`, `submitQuiz(id, answers)`.
+- [ ] `QuizList.tsx`: chọn deck, số câu, loại câu → tạo bài quiz mới.
+- [ ] `QuizPlayer.tsx`: render theo `type` (MCQ, fill_blank, matching, listening, ordering) + timer đếm ngược.
+- [ ] `QuizResult.tsx`: điểm số, số câu đúng/sai, `explanation` từng câu, +XP toast (style giống `StudySession.tsx`).
+- [ ] Đồng bộ lại XP/Streak trong `AuthContext` sau khi nộp bài (gọi `refreshUser()`).
 
 ---
 
 ### ⏳ Phase 5: Admin Dashboard & Production Deploy
-- [ ] **Admin Dashboard:** Quản lý tài khoản (Khóa/Mở) và duyệt các bộ thẻ công khai (`status: 'draft' | 'pending' | 'approved'`).
-- [ ] **Production Deployment:** Deploy Frontend lên **Vercel**, Backend lên **Render**.
-- [ ] **UptimeRobot:** Cấu hình ping định kỳ 10 phút/lần giữ warm backend server.
+
+**Backend:**
+- [ ] `admin.middleware.ts`: check `req.user.role === 'admin'`, trả 403 nếu không phải admin.
+- [ ] Thêm field `isLocked: boolean` vào `User` model; chặn login nếu `isLocked === true`.
+- [ ] `admin.controller.ts` + routes: `GET /api/admin/users`, `PATCH /api/admin/users/:id/lock`, `GET /api/admin/decks?status=pending`, `PATCH /api/admin/decks/:id/approve`, `PATCH /api/admin/decks/:id/reject`.
+- [ ] Cấu hình deploy Render: build command `pnpm build:shared && pnpm build:backend`, start command `node dist/server.js`, khai báo đủ env vars (`MONGODB_URI`, `JWT_*_SECRET`, `CLOUDINARY_*`, `CLIENT_URL`).
+- [ ] UptimeRobot: trỏ monitor HTTP GET vào `/api/health` (đã có sẵn), 10 phút/lần.
+- [ ] Cập nhật CORS whitelist trong `server.ts` thêm domain Vercel thật khi có.
+
+**Frontend:**
+- [ ] `AdminDashboard.tsx` + route `/admin` (guard redirect nếu `user.role !== 'admin'`).
+- [ ] Bảng quản lý user (khoá/mở tài khoản).
+- [ ] Hàng đợi duyệt deck công khai (approve/reject).
+- [ ] `admin.service.ts` gọi các API admin ở trên.
+- [ ] `vercel.json`: cấu hình rewrite SPA cho React Router (tránh 404 khi refresh trang con).
+- [ ] Set biến `VITE_API_BASE_URL` trên Vercel dashboard trỏ về domain Render (phần code đã làm sẵn từ Phase 3).

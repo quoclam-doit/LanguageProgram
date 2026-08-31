@@ -52,6 +52,7 @@ export interface Deck {
 export interface CardMeaning {
   langCode: string;
   text: string;
+  partOfSpeech: string;
 }
 
 export interface CardExample {

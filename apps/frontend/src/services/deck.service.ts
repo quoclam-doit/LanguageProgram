@@ -1,4 +1,4 @@
-const API_BASE = '/api/decks';
+import { API_BASE } from './api';
 
 export interface DeckData {
   _id: string;
@@ -15,21 +15,21 @@ export interface DeckData {
 
 export const deckService = {
   async getDecks(): Promise<DeckData[]> {
-    const res = await fetch(API_BASE, { credentials: 'include' });
+    const res = await fetch(`${API_BASE}/decks`, { credentials: 'include' });
     const json = await res.json();
     if (!json.success) throw new Error(json.error || 'Lỗi khi tải danh sách bộ thẻ');
     return json.data;
   },
 
   async getDeckById(id: string): Promise<DeckData> {
-    const res = await fetch(`${API_BASE}/${id}`, { credentials: 'include' });
+    const res = await fetch(`${API_BASE}/decks/${id}`, { credentials: 'include' });
     const json = await res.json();
     if (!json.success) throw new Error(json.error || 'Lỗi khi tải bộ thẻ');
     return json.data;
   },
 
   async createDeck(data: { title: string; description?: string; isPublic?: boolean; tags?: string[] }): Promise<DeckData> {
-    const res = await fetch(API_BASE, {
+    const res = await fetch(`${API_BASE}/decks`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -41,7 +41,7 @@ export const deckService = {
   },
 
   async deleteDeck(id: string): Promise<void> {
-    const res = await fetch(`${API_BASE}/${id}`, {
+    const res = await fetch(`${API_BASE}/decks/${id}`, {
       method: 'DELETE',
       credentials: 'include',
     });

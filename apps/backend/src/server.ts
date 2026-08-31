@@ -7,6 +7,7 @@ import { authRoutes } from './routes/auth.routes';
 import deckRoutes from './routes/deck.routes';
 import cardRoutes from './routes/card.routes';
 import srsRoutes from './routes/srs.routes';
+import dictionaryRoutes from './routes/dictionary.routes';
 import { errorHandler } from './middlewares/error.middleware';
 
 dotenv.config();
@@ -55,6 +56,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/decks', deckRoutes);
 app.use('/api/cards', cardRoutes);
 app.use('/api/srs', srsRoutes);
+app.use('/api/dictionary', dictionaryRoutes);
 
 // 4. Global Error Middleware
 app.use(errorHandler);

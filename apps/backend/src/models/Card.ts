@@ -5,7 +5,7 @@ export interface ICardDocument extends Document {
   langCode: string;
   term: string;
   ipa?: { us?: string; uk?: string };
-  meanings: Array<{ langCode: string; text: string }>;
+  meanings: Array<{ langCode: string; text: string; partOfSpeech: string }>;
   examples: Array<{ en: string; vi?: string }>;
   audioUrl?: string;
   imageUrl?: string;
@@ -26,6 +26,7 @@ const CardSchema = new Schema<ICardDocument>(
       {
         langCode: { type: String, required: true },
         text: { type: String, required: true },
+        partOfSpeech: { type: String, required: true },
       },
     ],
     examples: [

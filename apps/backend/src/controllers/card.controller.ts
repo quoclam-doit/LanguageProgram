@@ -7,7 +7,15 @@ import { UserCardState } from '../models/UserCardState';
 const createCardSchema = z.object({
   term: z.string().min(1, 'Từ vựng không được để trống'),
   ipa: z.object({ us: z.string().optional(), uk: z.string().optional() }).optional(),
-  meanings: z.array(z.object({ langCode: z.string(), text: z.string() })).min(1, 'Phải có ít nhất 1 nghĩa tiếng Việt'),
+  meanings: z
+    .array(
+      z.object({
+        langCode: z.string(),
+        text: z.string(),
+        partOfSpeech: z.string().min(1, 'Phải chọn từ loại (danh từ, động từ...)'),
+      })
+    )
+    .min(1, 'Phải có ít nhất 1 nghĩa tiếng Việt'),
   examples: z.array(z.object({ en: z.string(), vi: z.string().optional() })).optional().default([]),
   audioUrl: z.string().optional(),
   imageUrl: z.string().optional(),

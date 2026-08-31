@@ -12,7 +12,7 @@ const sampleOxfordCards = [
   {
     term: 'Resilience',
     ipa: { us: '/rɪˈzɪl.jəns/', uk: '/rɪˈzɪl.jəns/' },
-    meanings: [{ langCode: 'vi', text: 'Khả năng phục hồi, sự kiên cường vượt qua nghịch cảnh' }],
+    meanings: [{ langCode: 'vi', text: 'Khả năng phục hồi, sự kiên cường vượt qua nghịch cảnh', partOfSpeech: 'n' }],
     examples: [
       { en: 'Her resilience helped her overcome every obstacle in learning English.', vi: 'Sự kiên cường giúp cô ấy vượt qua mọi rào cản khi học tiếng Anh.' },
       { en: 'The community showed remarkable resilience after the disaster.', vi: 'Cộng đồng cho thấy sự kiên cường đáng kinh ngạc sau thiên tai.' }
@@ -21,7 +21,7 @@ const sampleOxfordCards = [
   {
     term: 'Collaborate',
     ipa: { us: '/kəˈlæb.ə.reɪt/', uk: '/kəˈlæb.ə.reɪt/' },
-    meanings: [{ langCode: 'vi', text: 'Hợp tác, phối hợp cùng làm việc' }],
+    meanings: [{ langCode: 'vi', text: 'Hợp tác, phối hợp cùng làm việc', partOfSpeech: 'v' }],
     examples: [
       { en: 'Teams from different departments collaborate on global projects.', vi: 'Các đội ngũ từ các phòng ban khác nhau hợp tác trong dự án toàn cầu.' }
     ]
@@ -29,7 +29,7 @@ const sampleOxfordCards = [
   {
     term: 'Meticulous',
     ipa: { us: '/məˈtɪk.jə.ləs/', uk: '/məˈtɪk.jə.ləs/' },
-    meanings: [{ langCode: 'vi', text: 'Tỉ mỉ, cẩn thận, chỉn chu từng chi tiết' }],
+    meanings: [{ langCode: 'vi', text: 'Tỉ mỉ, cẩn thận, chỉn chu từng chi tiết', partOfSpeech: 'adj' }],
     examples: [
       { en: 'He gave a meticulous presentation in front of the examiners.', vi: 'Anh ấy có bài trình bày chỉn chu trước các giám khảo.' }
     ]
@@ -37,7 +37,7 @@ const sampleOxfordCards = [
   {
     term: 'Perseverance',
     ipa: { us: '/ˌpɜː.sɪˈvɪə.rəns/', uk: '/ˌpɜː.sɪˈvɪə.rəns/' },
-    meanings: [{ langCode: 'vi', text: 'Sự kiên trì, bền bỉ theo đuổi mục tiêu' }],
+    meanings: [{ langCode: 'vi', text: 'Sự kiên trì, bền bỉ theo đuổi mục tiêu', partOfSpeech: 'n' }],
     examples: [
       { en: 'Through hard work and perseverance, she passed the IELTS exam.', vi: 'Nhờ chăm chỉ và kiên trì, cô ấy đã vượt qua kỳ thi IELTS.' }
     ]
@@ -45,7 +45,7 @@ const sampleOxfordCards = [
   {
     term: 'Eloquence',
     ipa: { us: '/ˈel.ə.kwəns/', uk: '/ˈel.ə.kwəns/' },
-    meanings: [{ langCode: 'vi', text: 'Khả năng hùng biện, tài ăn nói lưu loát' }],
+    meanings: [{ langCode: 'vi', text: 'Khả năng hùng biện, tài ăn nói lưu loát', partOfSpeech: 'n' }],
     examples: [
       { en: 'His speech was full of passion and eloquence.', vi: 'Bài phát biểu của anh ấy tràn đầy nhiệt huyết và sự hùng biện.' }
     ]
@@ -53,7 +53,7 @@ const sampleOxfordCards = [
   {
     term: 'Pragmatic',
     ipa: { us: '/præɡˈmæt.ɪk/', uk: '/præɡˈmæt.ɪk/' },
-    meanings: [{ langCode: 'vi', text: 'Thực tế, trọng thực tiễn' }],
+    meanings: [{ langCode: 'vi', text: 'Thực tế, trọng thực tiễn', partOfSpeech: 'adj' }],
     examples: [
       { en: 'We need a pragmatic approach to solving this software bug.', vi: 'Chúng ta cần giải pháp thực tế để khắc phục lỗi phần mềm này.' }
     ]

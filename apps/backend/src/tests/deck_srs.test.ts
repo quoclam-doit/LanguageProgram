@@ -67,7 +67,7 @@ describe('Phase 2: Deck, Card & FSRS SRS Engine Integration Tests', () => {
       .send({
         term: 'Perseverance',
         ipa: { us: '/ˌpɜː.sɪˈvɪə.rəns/' },
-        meanings: [{ langCode: 'vi', text: 'Sự kiên trì, bền bỉ' }],
+        meanings: [{ langCode: 'vi', text: 'Sự kiên trì, bền bỉ', partOfSpeech: 'n' }],
         examples: [
           { en: 'Success requires hard work and perseverance.', vi: 'Thành công đòi hỏi sự chăm chỉ và kiên trì.' },
         ],
