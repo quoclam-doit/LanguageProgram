@@ -21,9 +21,12 @@ yarn-error.log*
 pnpm-debug.log*
 *.log
 
-# IDE & OS files
+# IDE, OS & AI agent configuration
 .DS_Store
 Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+.claude/
+.agents/
+.scratch/
