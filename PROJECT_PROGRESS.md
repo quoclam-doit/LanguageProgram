@@ -2,7 +2,7 @@
 
 > **Repository:** `https://github.com/quoclam-doit/LanguageProgram.git`  
 > **Cập nhật lần cuối:** 31/08/2026  
-> **Trạng thái chung:** Phase 1 Đã Hoàn Thành 100% | Đang chuẩn bị khởi động Phase 2  
+> **Trạng thái chung:** Phase 1 & Phase 2 Đã Hoàn Thành 100% | Chuẩn bị khởi động Phase 3  
 
 ---
 
@@ -11,8 +11,8 @@
 | Phase | Nội Dung Công Việc | Trạng Thái | Tiến Độ |
 | :--- | :--- | :---: | :---: |
 | **Phase 1** | Monorepo Setup, Express Backend, Auth HttpOnly Cookie, Vitest Suite & UI Anti-Slop | ✅ **Hoàn thành** | **100%** |
-| **Phase 2** | Thẻ Học Flashcard, CRUD Deck/Card, Cloudinary Upload & Thuật Toán FSRS Engine | 🔄 **Giai đoạn tiếp theo** | **0%** |
-| **Phase 3** | Dictionary Pipeline 3 Tầng & Async Import CSV Background Queue | ⏳ **Chờ xử lý** | **0%** |
+| **Phase 2** | Thẻ Học Flashcard, CRUD Deck/Card, Cloudinary Upload & Thuật Toán FSRS Engine | ✅ **Hoàn thành** | **100%** |
+| **Phase 3** | Dictionary Pipeline 3 Tầng & Async Import CSV Background Queue | 🔄 **Giai đoạn tiếp theo** | **0%** |
 | **Phase 4** | Engine Trắc Nghiệm (5 Dạng Quiz) & Gamification (XP, Streak, Level) | ⏳ **Chờ xử lý** | **0%** |
 | **Phase 5** | Admin Dashboard, UptimeRobot Ping & Production Deploy (Vercel + Render) | ⏳ **Chờ xử lý** | **0%** |
 
@@ -35,20 +35,29 @@
 
 ---
 
-### 🔄 Phase 2: Thẻ Học Flashcard Module & Động Cơ FSRS Engine (Giai đoạn tiếp theo)
-- [ ] **Mongoose Schemas:** 
+### ✅ Phase 2: Thẻ Học Flashcard Module & Động Cơ FSRS Engine (100%)
+- [x] **Mongoose Schemas:** 
   - `Deck`: Quản lý bộ thẻ (ownerId, langCode, isPublic, status...).
   - `Card`: Quản lý thẻ từ vựng (term, ipa, meanings, examples, audioUrl, imageUrl...).
   - `UserCardState`: Lưu 1 bản ghi duy nhất cho mỗi cặp `(userId, cardId)` chứa thông số FSRS (`stability`, `difficulty`, `due`, `reps`, `lapses`...).
   - `ReviewLog`: Nhật ký ôn tập (append-only) phục vụ analytics.
-- [ ] **Cloudinary Integration:** Viết service upload ảnh minh họa & audio phát âm cho Card.
-- [ ] **FSRS Algorithm Engine:** Tích hợp `ts-fsrs` để tính toán thời gian `due` khi học viên bấm 4 nút `Again`, `Hard`, `Good`, `Easy`.
-- [ ] **Flashcard Study Session UI:** Giao diện học lật thẻ 3D, âm thanh Web Speech API và chấm điểm FSRS.
-- [ ] **Oxford 3000 Dataset:** Script seed bộ từ vựng chuẩn 3000 từ Oxford.
+- [x] **Services & Cloudinary:**
+  - `fsrs.service.ts`: Tích hợp `ts-fsrs` SDK tính toán mốc thời gian `due` và thuật toán FSRS.
+  - `cloudinary.service.ts`: Service upload ảnh minh họa & audio phát âm.
+- [x] **Express Controllers & Routes:**
+  - `/api/decks`: CRUD Bộ thẻ cá nhân + danh sách bộ thẻ công khai được duyệt.
+  - `/api/cards`: CRUD Thẻ từ vựng (tự động cập nhật `cardCount`).
+  - `/api/srs/due` & `/api/srs/review`: Truy vấn thẻ cần học và ghi nhận đánh giá FSRS `Again/Hard/Good/Easy`, cộng **+10 XP** và tính Streak.
+- [x] **Vitest Test Suite:** Viết 5 bài Integration Tests trong `apps/backend/src/tests/deck_srs.test.ts` (Tổng 13/13 Vitest tests PASS 100%).
+- [x] **Oxford 3000 Dataset Seed:** Script `seedOxford3000.ts` nạp sẵn bộ thẻ chuẩn Oxford 3000.
+- [x] **Frontend Flashcard & Study Session UI:**
+  - [`DeckList.tsx`](file:///f:/EnglishProgram/apps/frontend/src/pages/DeckList.tsx): Danh sách bộ thẻ & modal tạo bộ thẻ mới.
+  - [`DeckDetail.tsx`](file:///f:/EnglishProgram/apps/frontend/src/pages/DeckDetail.tsx): Chi tiết bộ thẻ & modal thêm từ vựng.
+  - [`StudySession.tsx`](file:///f:/EnglishProgram/apps/frontend/src/pages/StudySession.tsx): Giao diện học Lật thẻ 3D, nút nghe phát âm Web Speech API, 4 nút FSRS `Again`/`Hard`/`Good`/`Easy` kèm thời gian hẹn ôn (`10m`, `1d`, `3d`, `7d`), thanh tiến độ, hiệu ứng cộng XP và màn hình ăn mừng hoàn thành bài học.
 
 ---
 
-### ⏳ Phase 3: Tra Từ Tự Động (Dictionary Pipeline) & Import CSV Bất Đồng Bộ
+### 🔄 Phase 3: Tra Từ Tự Động (Dictionary Pipeline) & Import CSV Bất Đồng Bộ (Giai đoạn tiếp theo)
 - [ ] **Global `DictionaryStore` Collection:** Cache từ vựng dùng chung toàn hệ thống (`word`, `ipa`, `meanings`, `translations`).
 - [ ] **Luồng Tra Từ 3 Tầng:** `DB Cache` $\rightarrow$ `Free Dictionary API` $\rightarrow$ `Gemini Flash LLM Fallback` $\rightarrow$ `User Nhập Thủ Công`.
 - [ ] **Async CSV Import Queue:** Backend tiếp nhận file CSV $\rightarrow$ Lưu thô trả kết quả ngay $\rightarrow$ Worker ngầm chạy bổ sung phiên âm IPA, dịch nghĩa và audio.

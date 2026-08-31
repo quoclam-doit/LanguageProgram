@@ -4,6 +4,9 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import { authRoutes } from './routes/auth.routes.js';
+import deckRoutes from './routes/deck.routes.js';
+import cardRoutes from './routes/card.routes.js';
+import srsRoutes from './routes/srs.routes.js';
 import { errorHandler } from './middlewares/error.middleware.js';
 
 dotenv.config();
@@ -34,6 +37,9 @@ app.get('/api/health', (req, res) => {
 
 // 3. Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/decks', deckRoutes);
+app.use('/api/cards', cardRoutes);
+app.use('/api/srs', srsRoutes);
 
 // 4. Global Error Middleware
 app.use(errorHandler);
