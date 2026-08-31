@@ -4,7 +4,6 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import {
   Cards,
   BookOpen,
-  Sparkle,
   Flame,
   ArrowRight,
   SpeakerHigh,
@@ -14,10 +13,9 @@ import {
   Users,
   Check,
   CaretDown,
-  Lightning,
+  CaretLeft,
+  CaretRight,
   Microphone,
-  Trophy,
-  Bookmarks,
 } from '@phosphor-icons/react';
 import { useAuth } from '../store/AuthContext';
 
@@ -55,8 +53,9 @@ export const Home: React.FC = () => {
   // Mode Switcher Tab State
   const [activeTab, setActiveTab] = useState<'srs' | 'quiz' | 'tts' | 'streak'>('srs');
 
-  // Deck Category Filter State
+  // Deck Category Filter State & Carousel Slide Index
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [carouselIndex, setCarouselIndex] = useState<number>(0);
 
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -103,7 +102,7 @@ export const Home: React.FC = () => {
     }, 1400);
   };
 
-  // Sample Decks Data
+  // Sample Decks Data with Rich Cover Photos & Sample Vocab Chips
   const sampleDecks = [
     {
       id: '1',
@@ -114,7 +113,9 @@ export const Home: React.FC = () => {
       learners: 14200,
       rating: 4.9,
       tag: 'Cơ bản - Trung cấp',
-      badgeColor: 'bg-indigo-50 border-indigo-200 text-indigo-700',
+      cover: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&auto=format&fit=crop&q=80',
+      sampleWords: ['resilience', 'eloquent', 'pragmatic'],
+      badgeColor: 'from-amber-500 to-orange-500',
     },
     {
       id: '2',
@@ -125,7 +126,9 @@ export const Home: React.FC = () => {
       learners: 9800,
       rating: 4.8,
       tag: 'Đi Làm - Công Sở',
-      badgeColor: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+      cover: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80',
+      sampleWords: ['collaborate', 'negotiate', 'agenda'],
+      badgeColor: 'from-blue-500 to-indigo-500',
     },
     {
       id: '3',
@@ -136,7 +139,9 @@ export const Home: React.FC = () => {
       learners: 7300,
       rating: 4.9,
       tag: 'Học Thuật Nâng Cao',
-      badgeColor: 'bg-purple-50 border-purple-200 text-purple-700',
+      cover: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=600&auto=format&fit=crop&q=80',
+      sampleWords: ['meticulous', 'substantive', 'paradigm'],
+      badgeColor: 'from-purple-500 to-pink-500',
     },
     {
       id: '4',
@@ -147,7 +152,9 @@ export const Home: React.FC = () => {
       learners: 5600,
       rating: 4.7,
       tag: 'Thực Tế Du Lịch',
-      badgeColor: 'bg-amber-50 border-amber-200 text-amber-700',
+      cover: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&auto=format&fit=crop&q=80',
+      sampleWords: ['itinerary', 'boarding', 'concierge'],
+      badgeColor: 'from-emerald-500 to-teal-500',
     },
     {
       id: '5',
@@ -158,7 +165,9 @@ export const Home: React.FC = () => {
       learners: 8100,
       rating: 4.9,
       tag: 'Phản Xạ Tự Nhiên',
-      badgeColor: 'bg-rose-50 border-rose-200 text-rose-700',
+      cover: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&auto=format&fit=crop&q=80',
+      sampleWords: ['break a leg', 'hit the sack', 'under the weather'],
+      badgeColor: 'from-rose-500 to-red-500',
     },
     {
       id: '6',
@@ -169,7 +178,9 @@ export const Home: React.FC = () => {
       learners: 4200,
       rating: 4.8,
       tag: 'Chuyên Ngành IT',
-      badgeColor: 'bg-cyan-50 border-cyan-200 text-cyan-700',
+      cover: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
+      sampleWords: ['deprecated', 'refactor', 'concurrency'],
+      badgeColor: 'from-cyan-500 to-blue-500',
     },
   ];
 
@@ -177,6 +188,19 @@ export const Home: React.FC = () => {
     selectedCategory === 'all'
       ? sampleDecks
       : sampleDecks.filter((d) => d.category === selectedCategory);
+
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategory(cat);
+    setCarouselIndex(0);
+  };
+
+  const nextSlide = () => {
+    setCarouselIndex((prev) => (prev + 1) % filteredDecks.length);
+  };
+
+  const prevSlide = () => {
+    setCarouselIndex((prev) => (prev - 1 + filteredDecks.length) % filteredDecks.length);
+  };
 
   // Learner Reviews Data
   const learnerReviews = [
@@ -228,33 +252,32 @@ export const Home: React.FC = () => {
 
   return (
     <div className="relative min-h-[calc(100dvh-68px)] bg-[#faf9f6] text-slate-800 overflow-x-hidden">
-      {/* Scroll Parallax Ambient Glow */}
+      {/* Ambient Glow */}
       <motion.div
         style={{ y: bgGlowY }}
-        className="pointer-events-none absolute -top-24 right-0 -z-10 h-96 w-96 rounded-full bg-indigo-200/50 blur-3xl"
+        className="pointer-events-none absolute -top-24 right-0 -z-10 h-96 w-96 rounded-full bg-slate-200/40 blur-3xl"
       />
 
-      {/* ---------------- SECTION 1: HERO SECTION WITH PARALLAX ---------------- */}
-      <section ref={heroRef} className="relative mx-auto flex max-w-7xl flex-col justify-center px-4 pt-10 pb-16 sm:px-6 lg:px-8">
+      {/* ---------------- SECTION 1: HERO SECTION ---------------- */}
+      <section ref={heroRef} className="relative mx-auto flex max-w-7xl flex-col justify-center px-4 pt-12 pb-16 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-12">
-          {/* Left Column: Parallax Text & CTAs */}
+          {/* Left Column: Clean Editorial Copy */}
           <motion.div
             style={{ y: heroY, opacity: heroOpacity }}
             className="flex flex-col items-start lg:col-span-6"
           >
-            {/* Friendly Pill Badge */}
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-xs font-bold text-indigo-700 shadow-2xs">
-              <Sparkle weight="fill" className="h-4 w-4 text-indigo-600 animate-pulse" />
-              <span>Học Từ Vựng Dễ Dàng & Ghi Nhớ Lâu</span>
-            </div>
+            {/* Clean Category Label */}
+            <span className="font-mono text-xs font-bold uppercase tracking-widest text-indigo-600">
+              LINGOVERSE — SMART VOCABULARY PLATFORM
+            </span>
 
-            {/* Headline */}
-            <h1 className="font-heading text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl leading-[1.12]">
-              Biến từ vựng mới thành <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-500 bg-clip-text text-transparent">vốn từ của bạn</span> mỗi ngày.
+            {/* Solid Editorial Headline */}
+            <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl leading-[1.12]">
+              Biến từ vựng mới thành <span className="text-indigo-600 underline decoration-indigo-200 underline-offset-8">vốn từ của bạn</span> mỗi ngày.
             </h1>
 
             {/* Subtext */}
-            <p className="mt-5 max-w-[54ch] text-base text-slate-600 sm:text-lg leading-relaxed">
+            <p className="mt-6 max-w-[54ch] text-base text-slate-600 sm:text-lg leading-relaxed">
               Giải thích nghĩa chi tiết bằng tiếng Việt gần gũi, phát âm chuẩn người bản xứ và hệ thống nhắc ôn tập thông minh đúng thời điểm.
             </p>
 
@@ -263,7 +286,7 @@ export const Home: React.FC = () => {
               {user ? (
                 <Link
                   to="/dashboard"
-                  className="gradient-indigo-btn flex items-center gap-2.5 rounded-xl px-7 py-3.5 text-base font-bold text-white active:scale-[0.98]"
+                  className="btn-primary flex items-center gap-2.5 rounded-xl px-7 py-3.5 text-base font-bold active:scale-[0.98]"
                 >
                   <span>Bảng Học Tập</span>
                   <ArrowRight weight="bold" className="h-5 w-5" />
@@ -272,7 +295,7 @@ export const Home: React.FC = () => {
                 <>
                   <Link
                     to="/register"
-                    className="gradient-indigo-btn flex items-center gap-2.5 rounded-xl px-7 py-3.5 text-base font-bold text-white active:scale-[0.98]"
+                    className="btn-primary flex items-center gap-2.5 rounded-xl px-7 py-3.5 text-base font-bold active:scale-[0.98]"
                   >
                     <span>Bắt Đầu Học Miễn Phí</span>
                     <ArrowRight weight="bold" className="h-5 w-5" />
@@ -321,17 +344,14 @@ export const Home: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Right Column: 3D Parallax Floating Card Stack */}
+          {/* Right Column: 3D Interactive Flashcard */}
           <motion.div
             style={{ y: cardStackY, rotateZ: cardStackRotate }}
             className="relative lg:col-span-6"
           >
             <div className="relative mx-auto max-w-md">
-              {/* Back Card Stack Shadows */}
-              <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-indigo-400/20 to-purple-400/20 blur-xl" />
-
               {/* Card Switcher Selector Pill */}
-              <div className="relative mb-3 flex items-center justify-between rounded-xl bg-white border border-slate-200/90 p-1.5 shadow-xs">
+              <div className="relative mb-3 flex items-center justify-between rounded-xl bg-white border border-slate-200/90 p-1.5 shadow-2xs">
                 <span className="ml-2 text-xs font-bold text-slate-600">Thử lật thẻ demo:</span>
                 <div className="flex items-center gap-1">
                   {heroCards.map((c, i) => (
@@ -343,7 +363,7 @@ export const Home: React.FC = () => {
                       }}
                       className={`rounded-lg px-2.5 py-1 text-xs font-bold transition ${
                         activeHeroCard === i
-                          ? 'bg-indigo-600 text-white shadow-2xs'
+                          ? 'bg-indigo-600 text-white'
                           : 'text-slate-600 hover:bg-slate-100'
                       }`}
                     >
@@ -356,7 +376,7 @@ export const Home: React.FC = () => {
               {/* Main 3D Card */}
               <div
                 onClick={() => setIsFlipped(!isFlipped)}
-                className="perspective-1000 cursor-pointer rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl transition hover:border-indigo-300 hover:shadow-indigo-500/10"
+                className="perspective-1000 cursor-pointer rounded-2xl border border-slate-200 bg-white p-6 shadow-xl transition hover:border-indigo-300"
               >
                 <div
                   className={`transform-style-3d relative min-h-[300px] w-full transition-transform duration-500 ${
@@ -366,7 +386,7 @@ export const Home: React.FC = () => {
                   {/* Front Side */}
                   <div className="backface-hidden flex min-h-[300px] flex-col justify-between rounded-xl border border-slate-100 bg-slate-50/90 p-6 text-slate-800">
                     <div className="flex items-center justify-between">
-                      <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700 border border-indigo-200/80">
+                      <span className="rounded-md bg-slate-200/80 px-2.5 py-1 text-xs font-bold text-slate-700">
                         {currentCard.tag}
                       </span>
                       <button
@@ -462,15 +482,11 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ---------------- SECTION 2: INTERACTIVE LEARNING MODES WITH SCROLL PARALLAX ---------------- */}
+      {/* ---------------- SECTION 2: INTERACTIVE LEARNING MODES ---------------- */}
       <section ref={featureRef} className="border-t border-slate-200 bg-white py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3.5 py-1 text-xs font-bold text-indigo-700">
-              <Lightning weight="fill" className="h-3.5 w-3.5 text-indigo-600" />
-              <span>Trải Nghiệm Học Tập Đa Dạng</span>
-            </div>
-            <h2 className="mt-3 font-heading text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="font-heading text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
               Mọi tính năng bạn cần để làm chủ từ vựng
             </h2>
             <p className="mt-3 text-base text-slate-600">
@@ -528,7 +544,7 @@ export const Home: React.FC = () => {
             </div>
           </div>
 
-          {/* Dynamic Tab Content Preview with Parallax Motion */}
+          {/* Dynamic Tab Content Preview */}
           <div className="mt-8">
             <AnimatePresence mode="wait">
               {activeTab === 'srs' && (
@@ -538,13 +554,13 @@ export const Home: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -16 }}
                   transition={{ duration: 0.3 }}
-                  className="glass-card-light grid items-center gap-8 rounded-3xl p-8 lg:grid-cols-12"
+                  className="app-card grid items-center gap-8 rounded-3xl p-8 lg:grid-cols-12"
                 >
                   <motion.div style={{ y: featureParallaxY1 }} className="lg:col-span-7">
-                    <span className="rounded-md bg-indigo-100 px-2.5 py-1 text-xs font-bold text-indigo-700">
-                      Thuật Toán Ôn Tập Tự Động
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-indigo-600">
+                      THUẬT TOÁN ÔN TẬP TỰ ĐỘNG
                     </span>
-                    <h3 className="mt-3 font-heading text-2xl font-bold text-slate-900">
+                    <h3 className="mt-2 font-heading text-2xl font-bold text-slate-900">
                       Chỉ ôn lại đúng những từ bạn chuẩn bị quên
                     </h3>
                     <p className="mt-3 text-slate-600 leading-relaxed">
@@ -584,13 +600,13 @@ export const Home: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -16 }}
                   transition={{ duration: 0.3 }}
-                  className="glass-card-light grid items-center gap-8 rounded-3xl p-8 lg:grid-cols-12"
+                  className="app-card grid items-center gap-8 rounded-3xl p-8 lg:grid-cols-12"
                 >
                   <motion.div style={{ y: featureParallaxY1 }} className="lg:col-span-7">
-                    <span className="rounded-md bg-purple-100 px-2.5 py-1 text-xs font-bold text-purple-700">
-                      Rèn Luyện Phản Xạ
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-purple-600">
+                      RÈN LUYỆN PHẢN XẠ
                     </span>
-                    <h3 className="mt-3 font-heading text-2xl font-bold text-slate-900">
+                    <h3 className="mt-2 font-heading text-2xl font-bold text-slate-900">
                       5 Dạng bài trắc nghiệm đa dạng & phong phú
                     </h3>
                     <p className="mt-3 text-slate-600 leading-relaxed">
@@ -640,13 +656,13 @@ export const Home: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -16 }}
                   transition={{ duration: 0.3 }}
-                  className="glass-card-light grid items-center gap-8 rounded-3xl p-8 lg:grid-cols-12"
+                  className="app-card grid items-center gap-8 rounded-3xl p-8 lg:grid-cols-12"
                 >
                   <motion.div style={{ y: featureParallaxY1 }} className="lg:col-span-7">
-                    <span className="rounded-md bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700">
-                      Âm Thanh Người Bản Xứ
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-600">
+                      ÂM THANH NGƯỜI BẢN XỨ
                     </span>
-                    <h3 className="mt-3 font-heading text-2xl font-bold text-slate-900">
+                    <h3 className="mt-2 font-heading text-2xl font-bold text-slate-900">
                       Nghe phát âm chuẩn & ví dụ ngữ cảnh thực tế
                     </h3>
                     <p className="mt-3 text-slate-600 leading-relaxed">
@@ -670,13 +686,13 @@ export const Home: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -16 }}
                   transition={{ duration: 0.3 }}
-                  className="glass-card-light grid items-center gap-8 rounded-3xl p-8 lg:grid-cols-12"
+                  className="app-card grid items-center gap-8 rounded-3xl p-8 lg:grid-cols-12"
                 >
                   <motion.div style={{ y: featureParallaxY1 }} className="lg:col-span-7">
-                    <span className="rounded-md bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700">
-                      Tạo Động Lực Học Mỗi Ngày
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-amber-600">
+                      TẠO ĐỘNG LỰC HỌC MỖI NGÀY
                     </span>
-                    <h3 className="mt-3 font-heading text-2xl font-bold text-slate-900">
+                    <h3 className="mt-2 font-heading text-2xl font-bold text-slate-900">
                       Tích lũy XP, giữ chuỗi Streak & tăng Cấp Độ
                     </h3>
                     <p className="mt-3 text-slate-600 leading-relaxed">
@@ -697,149 +713,213 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ---------------- SECTION 3: FEATURED DECK LIBRARY ---------------- */}
-      <section className="py-20">
+      {/* ---------------- SECTION 3: INTERACTIVE SLIDE CAROUSEL DECK SHOWCASE ---------------- */}
+      <section className="py-20 overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          {/* Header Controls Bar */}
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3.5 py-1 text-xs font-bold text-indigo-700">
-                <Bookmarks weight="fill" className="h-3.5 w-3.5 text-indigo-600" />
-                <span>Kho Bộ Thẻ Từ Vựng Phong Phú</span>
-              </div>
-              <h2 className="mt-3 font-heading text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                Khám phá các bộ thẻ chuẩn chọn lọc
+              <h2 className="font-heading text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                Khám phá các bộ thẻ chọn lọc
               </h2>
+              <p className="mt-2 text-sm text-slate-600">Bấm nút hoặc vuốt để khám phá các bộ thẻ từ vựng hấp dẫn nhất.</p>
             </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`rounded-xl px-4 py-2 text-xs font-bold transition ${
-                  selectedCategory === 'all'
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                Tất cả
-              </button>
-              <button
-                onClick={() => setSelectedCategory('communication')}
-                className={`rounded-xl px-4 py-2 text-xs font-bold transition ${
-                  selectedCategory === 'communication'
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                Giao Tiếp
-              </button>
-              <button
-                onClick={() => setSelectedCategory('toeic')}
-                className={`rounded-xl px-4 py-2 text-xs font-bold transition ${
-                  selectedCategory === 'toeic'
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                TOEIC
-              </button>
-              <button
-                onClick={() => setSelectedCategory('ielts')}
-                className={`rounded-xl px-4 py-2 text-xs font-bold transition ${
-                  selectedCategory === 'ielts'
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                IELTS
-              </button>
-              <button
-                onClick={() => setSelectedCategory('travel')}
-                className={`rounded-xl px-4 py-2 text-xs font-bold transition ${
-                  selectedCategory === 'travel'
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                Du Lịch
-              </button>
+            {/* Controls Right: Category Pills + Next/Prev Buttons */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Category Filter Pills */}
+              <div className="flex flex-wrap items-center gap-1.5 rounded-2xl bg-white p-1.5 border border-slate-200 shadow-2xs">
+                <button
+                  onClick={() => handleCategoryChange('all')}
+                  className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+                    selectedCategory === 'all'
+                      ? 'bg-indigo-600 text-white shadow-2xs'
+                      : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  Tất cả
+                </button>
+                <button
+                  onClick={() => handleCategoryChange('communication')}
+                  className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+                    selectedCategory === 'communication'
+                      ? 'bg-indigo-600 text-white shadow-2xs'
+                      : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  Giao Tiếp
+                </button>
+                <button
+                  onClick={() => handleCategoryChange('toeic')}
+                  className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+                    selectedCategory === 'toeic'
+                      ? 'bg-indigo-600 text-white shadow-2xs'
+                      : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  TOEIC
+                </button>
+                <button
+                  onClick={() => handleCategoryChange('ielts')}
+                  className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition ${
+                    selectedCategory === 'ielts'
+                      ? 'bg-indigo-600 text-white shadow-2xs'
+                      : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  IELTS
+                </button>
+              </div>
+
+              {/* Prev / Next Carousel Navigation Arrows */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={prevSlide}
+                  title="Bộ thẻ trước"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 shadow-xs transition hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-600 active:scale-95"
+                >
+                  <CaretLeft weight="bold" className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={nextSlide}
+                  title="Bộ thẻ tiếp theo"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 shadow-xs transition hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-600 active:scale-95"
+                >
+                  <CaretRight weight="bold" className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Deck Grid with Parallax Stagger */}
-          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredDecks.map((deck, idx) => (
-              <motion.div
-                key={deck.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.4, delay: idx * 0.08 }}
-                whileHover={{ y: -6 }}
-                className="glass-card-light flex flex-col justify-between rounded-2xl p-6 transition"
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className={`rounded-lg border px-3 py-1 text-xs font-bold ${deck.badgeColor}`}>
-                      {deck.tag}
-                    </span>
-                    <div className="flex items-center gap-1 text-xs font-bold text-amber-600">
-                      <Star weight="fill" className="h-3.5 w-3.5 text-amber-500" />
-                      <span>{deck.rating}</span>
+          {/* Carousel Slide Track */}
+          <div className="mt-8 relative w-full overflow-hidden">
+            <motion.div
+              animate={{ x: `-${carouselIndex * 100}%` }}
+              transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+              className="flex w-full gap-6"
+            >
+              {filteredDecks.map((deck) => (
+                <div
+                  key={deck.id}
+                  className="w-full shrink-0 sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
+                >
+                  <div className="group relative flex flex-col justify-between h-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg transition hover:shadow-xl hover:border-indigo-300">
+                    {/* Cover Image Container */}
+                    <div className="relative h-52 w-full overflow-hidden">
+                      <img
+                        src={deck.cover}
+                        alt={deck.title}
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/30 to-transparent" />
+
+                      {/* Cover Photo Pills */}
+                      <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+                        <span className={`rounded-full bg-gradient-to-r ${deck.badgeColor} px-3 py-1 text-xs font-bold text-white shadow-xs`}>
+                          {deck.tag}
+                        </span>
+                        <div className="flex items-center gap-1 rounded-full border border-amber-400/30 bg-slate-950/60 px-2.5 py-0.5 text-xs font-extrabold text-amber-300 backdrop-blur-md">
+                          <Star weight="fill" className="h-3.5 w-3.5 text-amber-400" />
+                          <span>{deck.rating}</span>
+                        </div>
+                      </div>
+
+                      {/* Title overlaid at bottom of photo */}
+                      <div className="absolute bottom-3 left-5 right-5 text-white">
+                        <h3 className="font-heading text-xl font-extrabold text-white leading-tight drop-shadow-sm">
+                          {deck.title}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* Card Content Body */}
+                    <div className="flex flex-1 flex-col justify-between p-5">
+                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
+                        {deck.description}
+                      </p>
+
+                      {/* Real Vocabulary Chips Preview */}
+                      <div className="mt-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          Từ vựng nổi bật:
+                        </p>
+                        <div className="mt-1.5 flex flex-wrap gap-1">
+                          {deck.sampleWords.map((word, wIdx) => (
+                            <span
+                              key={wIdx}
+                              className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[11px] font-semibold text-slate-700"
+                            >
+                              {word}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Card Footer Info & CTA */}
+                      <div className="mt-5 border-t border-slate-100 pt-4">
+                        <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+                          <span className="flex items-center gap-1">
+                            <Cards weight="duotone" className="h-4 w-4 text-indigo-600" />
+                            {deck.cardCount} thẻ
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users weight="duotone" className="h-4 w-4 text-emerald-600" />
+                            {deck.learners.toLocaleString()} học viên
+                          </span>
+                        </div>
+
+                        <Link
+                          to="/decks"
+                          className="btn-primary mt-4 flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold active:scale-[0.98]"
+                        >
+                          <span>Học Thẻ Ngay</span>
+                          <ArrowRight weight="bold" className="h-4 w-4" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
-
-                  <h3 className="mt-4 font-heading text-xl font-bold text-slate-900">{deck.title}</h3>
-                  <p className="mt-2 text-sm text-slate-600 leading-relaxed">{deck.description}</p>
                 </div>
+              ))}
+            </motion.div>
+          </div>
 
-                <div className="mt-6 border-t border-slate-200/80 pt-4">
-                  <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-                    <span className="flex items-center gap-1">
-                      <Cards weight="duotone" className="h-4 w-4 text-indigo-600" />
-                      {deck.cardCount} thẻ từ vựng
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Users weight="duotone" className="h-4 w-4 text-emerald-600" />
-                      {deck.learners.toLocaleString()} học viên
-                    </span>
-                  </div>
-
-                  <Link
-                    to="/decks"
-                    className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white py-2.5 text-sm font-bold text-indigo-600 shadow-2xs transition hover:bg-indigo-50 hover:border-indigo-200 active:scale-[0.98]"
-                  >
-                    <span>Khám Phá Bộ Thẻ</span>
-                    <ArrowRight weight="bold" className="h-4 w-4" />
-                  </Link>
-                </div>
-              </motion.div>
+          {/* Carousel Pagination Dots Indicator */}
+          <div className="mt-6 flex items-center justify-center gap-2">
+            {filteredDecks.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCarouselIndex(idx)}
+                title={`Trang ${idx + 1}`}
+                className={`h-2.5 rounded-full transition-all duration-300 ${
+                  carouselIndex === idx
+                    ? 'w-8 bg-indigo-600'
+                    : 'w-2.5 bg-slate-300 hover:bg-slate-400'
+                }`}
+              />
             ))}
           </div>
         </div>
       </section>
 
-      {/* ---------------- SECTION 4: LEARNER SUCCESS STORIES ---------------- */}
+      {/* ---------------- SECTION 4: LEARNER REVIEWS ---------------- */}
       <section className="border-t border-slate-200 bg-white py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 text-xs font-bold text-emerald-700">
-              <Trophy weight="fill" className="h-3.5 w-3.5 text-emerald-600" />
-              <span>Cảm Nhận Từ Học Viên</span>
-            </div>
-            <h2 className="mt-3 font-heading text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="font-heading text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
               Tiến bộ mỗi ngày cùng LingoVerse
             </h2>
+            <p className="mt-2 text-base text-slate-600">Cảm nhận thực tế từ các học viên đang học từ vựng mỗi ngày.</p>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {learnerReviews.map((review, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
                 className="app-card flex flex-col justify-between rounded-2xl p-6"
               >
                 <div>
@@ -918,10 +998,10 @@ export const Home: React.FC = () => {
       {/* ---------------- SECTION 6: BOTTOM CALL TO ACTION ---------------- */}
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.96 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.4 }}
           className="gradient-indigo-btn relative overflow-hidden rounded-3xl p-10 text-center text-white sm:p-16"
         >
           <div className="relative z-10 max-w-2xl mx-auto">

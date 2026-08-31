@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Lightning, Fire, Cards, BookOpen, Plus, Play, Sparkle } from '@phosphor-icons/react';
+import { Lightning, Fire, Cards, BookOpen, Plus, Play } from '@phosphor-icons/react';
 import { useAuth } from '../store/AuthContext';
 
 export const Dashboard: React.FC = () => {
@@ -28,11 +28,10 @@ export const Dashboard: React.FC = () => {
         {/* Welcome Header */}
         <div className="app-card flex flex-col justify-between gap-6 rounded-2xl p-6 sm:p-8 md:flex-row md:items-center">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700">
-              <Sparkle weight="fill" className="h-3.5 w-3.5 text-indigo-600" />
-              <span>Góc Học Viên LingoVerse</span>
-            </div>
-            <h1 className="mt-2 font-heading text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-indigo-600">
+              BẢNG HỌC TẬP CÁ NHÂN
+            </span>
+            <h1 className="mt-1 font-heading text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
               Chào mừng trở lại, {user.name}! 👋
             </h1>
             <p className="mt-1 text-sm text-slate-600">
@@ -71,7 +70,7 @@ export const Dashboard: React.FC = () => {
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
                   <Cards weight="duotone" className="h-6 w-6" />
                 </div>
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
+                <span className="rounded-md border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-700">
                   Cần ôn hôm nay
                 </span>
               </div>
