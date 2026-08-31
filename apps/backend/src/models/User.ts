@@ -10,7 +10,7 @@ export interface IUserDocument extends Document {
   xp: number;
   streak: {
     current: number;
-    lastLearnedDate: string | null;
+    lastLearnedDate: string;
   };
   role: 'learner' | 'admin';
   createdAt: Date;
@@ -28,7 +28,7 @@ const UserSchema = new Schema<IUserDocument>(
     xp: { type: Number, default: 0 },
     streak: {
       current: { type: Number, default: 0 },
-      lastLearnedDate: { type: String, default: null },
+      lastLearnedDate: { type: String, default: '' },
     },
     role: { type: String, enum: ['learner', 'admin'], default: 'learner' },
   },

@@ -14,12 +14,28 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
 
   try {
     const res = await fetch(`${API_BASE}${endpoint}`, config);
-    const data = await res.json();
+    const text = await res.text();
 
-    if (!res.ok && !data.error) {
+    let data: any = null;
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = null;
+      }
+    }
+
+    if (!res.ok) {
       return {
         success: false,
-        error: `HTTP Error ${res.status}: ${res.statusText}`,
+        error: data?.error || data?.message || `Lỗi máy chủ (${res.status}): Không thể xử lý yêu cầu`,
+      };
+    }
+
+    if (!data) {
+      return {
+        success: false,
+        error: 'Phản hồi từ máy chủ không đúng định dạng JSON',
       };
     }
 

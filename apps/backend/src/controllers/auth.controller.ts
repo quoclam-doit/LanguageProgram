@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
-import { User } from '../models/User.js';
-import { AuthenticatedRequest } from '../middlewares/auth.middleware.js';
+import { User } from '../models/User';
+import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 
 const registerSchema = z.object({
   email: z.string().email('Email không hợp lệ'),
@@ -82,7 +82,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       targetLangs: validatedData.targetLangs || ['en'],
       timezone: validatedData.timezone || 'Asia/Ho_Chi_Minh',
       xp: 0,
-      streak: { current: 0, lastLearnedDate: null },
+      streak: { current: 0, lastLearnedDate: '' },
       role: 'learner',
     });
 
@@ -93,6 +93,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
 
     setAuthCookies(res, accessToken, refreshToken);
+
+    const createdAtStr = newUser.createdAt
+      ? (newUser.createdAt instanceof Date ? newUser.createdAt : new Date(newUser.createdAt)).toISOString()
+      : new Date().toISOString();
 
     res.status(201).json({
       success: true,
@@ -109,16 +113,30 @@ export const register = async (req: Request, res: Response): Promise<void> => {
           level: calculateLevel(newUser.xp),
           streak: newUser.streak,
           role: newUser.role,
-          createdAt: newUser.createdAt.toISOString(),
+          createdAt: createdAtStr,
         },
       },
     });
   } catch (error: any) {
+    console.error('[Auth Register Error]:', error);
+
     if (error instanceof z.ZodError) {
       res.status(400).json({ success: false, error: error.errors[0].message });
       return;
     }
-    res.status(500).json({ success: false, error: error.message || 'Lỗi đăng ký tài khoản' });
+
+    // Handle Mongo Duplicate Key Error (E11000)
+    if (error.code === 11000) {
+      res.status(400).json({ success: false, error: 'Email này đã được sử dụng' });
+      return;
+    }
+
+    if (error.name === 'ValidationError' || error.name === 'CastError') {
+      res.status(400).json({ success: false, error: error.message || 'Dữ liệu không hợp lệ' });
+      return;
+    }
+
+    res.status(400).json({ success: false, error: error.message || 'Lỗi đăng ký tài khoản' });
   }
 };
 
@@ -146,6 +164,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     setAuthCookies(res, accessToken, refreshToken);
 
+    const createdAtStr = user.createdAt
+      ? (user.createdAt instanceof Date ? user.createdAt : new Date(user.createdAt)).toISOString()
+      : new Date().toISOString();
+
     res.json({
       success: true,
       message: 'Đăng nhập thành công',
@@ -161,16 +183,17 @@ export const login = async (req: Request, res: Response): Promise<void> => {
           level: calculateLevel(user.xp),
           streak: user.streak,
           role: user.role,
-          createdAt: user.createdAt.toISOString(),
+          createdAt: createdAtStr,
         },
       },
     });
   } catch (error: any) {
+    console.error('[Auth Login Error]:', error);
     if (error instanceof z.ZodError) {
       res.status(400).json({ success: false, error: error.errors[0].message });
       return;
     }
-    res.status(500).json({ success: false, error: error.message || 'Lỗi đăng nhập' });
+    res.status(400).json({ success: false, error: error.message || 'Lỗi đăng nhập' });
   }
 };
 
@@ -202,6 +225,10 @@ export const getMe = async (req: AuthenticatedRequest, res: Response): Promise<v
       return;
     }
 
+    const createdAtStr = user.createdAt
+      ? (user.createdAt instanceof Date ? user.createdAt : new Date(user.createdAt)).toISOString()
+      : new Date().toISOString();
+
     res.json({
       success: true,
       data: {
@@ -216,11 +243,12 @@ export const getMe = async (req: AuthenticatedRequest, res: Response): Promise<v
           level: calculateLevel(user.xp),
           streak: user.streak,
           role: user.role,
-          createdAt: user.createdAt.toISOString(),
+          createdAt: createdAtStr,
         },
       },
     });
   } catch (error: any) {
+    console.error('[Auth GetMe Error]:', error);
     res.status(500).json({ success: false, error: error.message || 'Lỗi lấy thông tin cá nhân' });
   }
 };

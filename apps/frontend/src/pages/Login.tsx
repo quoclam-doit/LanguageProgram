@@ -79,9 +79,10 @@ export const Login: React.FC = () => {
                 id="email"
                 type="email"
                 required
+                autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="vd: hocvien@example.com"
+                placeholder="name@example.com"
                 className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pr-4 pl-11 text-sm font-medium text-slate-800 placeholder-slate-400 shadow-2xs transition focus:border-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-100"
               />
             </div>
@@ -100,6 +101,7 @@ export const Login: React.FC = () => {
                 id="password"
                 type="password"
                 required
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"

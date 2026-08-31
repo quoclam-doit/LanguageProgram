@@ -6,8 +6,8 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ): void => {
-  console.error('[Error Middleware]', err);
-  const status = err.status || 500;
+  console.error('💥 [Global Error Middleware Caught]:', err);
+  const status = err.status || err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
 
   res.status(status).json({

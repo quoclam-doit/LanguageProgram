@@ -88,6 +88,7 @@ export const Register: React.FC = () => {
                 id="name"
                 type="text"
                 required
+                autoComplete="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="vd: Nguyễn Văn A"
@@ -107,6 +108,7 @@ export const Register: React.FC = () => {
                 id="email"
                 type="email"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="vd: name@example.com"
@@ -127,6 +129,7 @@ export const Register: React.FC = () => {
                 type="password"
                 required
                 minLength={6}
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"

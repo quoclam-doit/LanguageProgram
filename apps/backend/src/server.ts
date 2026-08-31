@@ -2,18 +2,33 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import { connectDB } from './config/db.js';
-import { authRoutes } from './routes/auth.routes.js';
-import deckRoutes from './routes/deck.routes.js';
-import cardRoutes from './routes/card.routes.js';
-import srsRoutes from './routes/srs.routes.js';
-import { errorHandler } from './middlewares/error.middleware.js';
+import { connectDB } from './config/db';
+import { authRoutes } from './routes/auth.routes';
+import deckRoutes from './routes/deck.routes';
+import cardRoutes from './routes/card.routes';
+import srsRoutes from './routes/srs.routes';
+import { errorHandler } from './middlewares/error.middleware';
 
 dotenv.config();
+
+// Global Process Error Listeners to prevent silent crashes
+process.on('uncaughtException', (err) => {
+  console.error('🔥 [UNCAUGHT EXCEPTION]:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🔥 [UNHANDLED REJECTION]:', reason);
+});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+
+// Request Logger Middleware
+app.use((req, res, next) => {
+  console.log(`📥 [API ${req.method}] ${req.url}`);
+  next();
+});
 
 // 1. Middlewares
 app.use(
@@ -46,11 +61,16 @@ app.use(errorHandler);
 
 // 5. Database Connection & Server Listen (Only in non-test mode)
 if (process.env.NODE_ENV !== 'test') {
-  connectDB();
-  app.listen(PORT, () => {
-    console.log(`[Express Backend] Server is running on port ${PORT}`);
-    console.log(`[Express Backend] Allowed CORS origin: ${CLIENT_URL}`);
-  });
+  connectDB()
+    .then(() => {
+      app.listen(Number(PORT), '0.0.0.0', () => {
+        console.log(`🚀 [Express Backend] Server is running on http://127.0.0.1:${PORT}`);
+        console.log(`🌐 [Express Backend] Allowed CORS origin: ${CLIENT_URL}`);
+      });
+    })
+    .catch((err) => {
+      console.error('❌ [Database Connection Failed]:', err);
+    });
 }
 
 export default app;

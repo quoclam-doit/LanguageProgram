@@ -15,8 +15,14 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://127.0.0.1:5000',
         changeOrigin: true,
+        secure: false,
+        configure: (proxy) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.error('[Vite Proxy Error]: Cannot connect to Express Backend (http://127.0.0.1:5000).', err.message);
+          });
+        },
       },
     },
   },
