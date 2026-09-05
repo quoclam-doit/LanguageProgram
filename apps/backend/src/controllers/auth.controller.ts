@@ -44,7 +44,7 @@ const generateTokens = (user: { id: string; email: string; role: string }) => {
 };
 
 const setAuthCookies = (res: Response, accessToken: string, refreshToken: string) => {
-  const isProd = process.env.NODE_ENV === 'production';
+  const isProd = process.env.NODE_ENV === 'production' || process.env.COOKIE_SECURE === 'true';
 
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
