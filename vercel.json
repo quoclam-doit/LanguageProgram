@@ -1,7 +1,6 @@
 {
   "buildCommand": "pnpm --filter @app/shared build && pnpm --filter @app/frontend build",
   "outputDirectory": "apps/frontend/dist",
-  "framework": "vite",
   "rewrites": [
     {
       "source": "/(.*)",
