@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#4338CA" />
+    </linearGradient>
+    <linearGradient id="sparkleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+  </defs>
+  <!-- Rounded Squircle Box -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+  
+  <!-- Outer Book / Globe Orbit Ring -->
+  <path d="M120 280 C120 180, 200 130, 320 150 C380 160, 400 200, 390 260 C380 320, 310 370, 200 360 C140 355, 120 320, 120 280 Z" stroke="#818CF8" stroke-width="24" stroke-linecap="round" opacity="0.4" />
+  
+  <!-- Main Speech / Lingo Sparkle Emblem -->
+  <path d="M160 350 V180 C160 160 176 144 196 144 H250 C310 144 350 180 350 230 C350 280 310 316 250 316 H208 L160 350 Z" fill="#FFFFFF" />
+  
+  <!-- Inner Lingo Accents -->
+  <circle cx="236" cy="230" r="22" fill="#4F46E5" />
+  <circle cx="294" cy="230" r="16" fill="#6366F1" opacity="0.8" />
+  
+  <!-- Star Sparkle -->
+  <path d="M370 120 L380 145 L405 155 L380 165 L370 190 L360 165 L335 155 L360 145 Z" fill="url(#sparkleGrad)" />
+</svg>
