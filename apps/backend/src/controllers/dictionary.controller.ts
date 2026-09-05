@@ -12,7 +12,16 @@ export const dictionaryController = {
       }
 
       const result = await lookupPhonetic(word);
-      res.status(200).json({ success: true, data: result });
+      res.status(200).json({
+        success: true,
+        data: {
+          // Flattened to match Card.audioUrl (a single string field), not
+          // DictionaryStore's internal {us,uk} cache shape - this endpoint's
+          // job is to feed the card-creation form directly.
+          ipa: result.ipa,
+          audioUrl: result.audioUrl.us || result.audioUrl.uk,
+        },
+      });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }

@@ -57,7 +57,7 @@ describe('Phase 3 Ticket 02: Dictionary phonetic lookup (2-tier)', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.ipa.us).toBe('/rɪˈzɪliəns/');
-    expect(res.body.data.audioUrl.us).toBe('https://example.com/resilience-us.mp3');
+    expect(res.body.data.audioUrl).toBe('https://example.com/resilience-us.mp3');
   });
 
   it('3. GET /api/dictionary/lookup - uses cache on repeat lookup (case/whitespace insensitive), does not call Free Dictionary API again', async () => {
@@ -86,7 +86,7 @@ describe('Phase 3 Ticket 02: Dictionary phonetic lookup (2-tier)', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.ipa).toEqual({});
-    expect(res.body.data.audioUrl).toEqual({});
+    expect(res.body.data.audioUrl).toBeFalsy();
   });
 
   it('5. GET /api/dictionary/lookup - returns empty ipa/audio (still 200) when Free Dictionary API throws a network error', async () => {

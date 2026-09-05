@@ -1,9 +1,11 @@
 export function downloadCsvTemplate(): void {
   const headers = ['term', 'partOfSpeech', 'meaning', 'exampleEn', 'exampleVi'];
   const sampleRows = [
-    ['abandon', 'verb', 'từ bỏ / bỏ rơi', 'Never abandon your dreams.', 'Đừng bao giờ từ bỏ ước mơ của bạn.'],
-    ['accurate', 'adjective', 'chính xác', 'The test results were accurate.', 'Kết quả kiểm tra rất chính xác.'],
-    ['ambition', 'noun', 'hoài bão / khát vọng', 'She has a strong ambition to succeed.', 'Cô ấy có khát vọng mạnh mẽ để thành công.'],
+    ['proud of', 'adjective phrase', 'tự hào về', 'She is proud of her academic achievements.', 'Cô ấy tự hào về những thành tích học tập của mình.'],
+    ['familiar with', 'adjective phrase', 'quen thuộc với', 'I am familiar with the software used in the company.', 'Tôi đã quen thuộc với phần mềm được sử dụng ở công ty.'],
+    ['interested in', 'adjective phrase', 'hứng thú với', 'He is interested in learning foreign languages.', 'Anh ấy rất hứng thú với việc học ngoại ngữ.'],
+    ['good at', 'adjective phrase', 'giỏi về', 'She is exceptionally good at solving complex math problems.', 'Cô ấy đặc biệt giỏi về việc giải các bài toán phức tạp.'],
+    ['capable of', 'adjective phrase', 'có khả năng', 'She is capable of handling high-stress situations.', 'Cô ấy có khả năng xử lý các tình huống nhiều áp lực.'],
   ];
 
   const csvContent = [
@@ -16,7 +18,7 @@ export function downloadCsvTemplate(): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', 'oxford_flashcard_template.csv');
+  link.setAttribute('download', 'ielts_flashcard_template.csv');
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

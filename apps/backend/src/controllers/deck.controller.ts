@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import { Types } from 'mongoose';
 import { Deck } from '../models/Deck';
 import { Card } from '../models/Card';
 import { UserCardState } from '../models/UserCardState';
@@ -24,12 +25,18 @@ export const deckController = {
   // GET /api/decks
   async getDecks(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id || (req as any).user?._id;
+      const userIdStr = (req as any).user?.id || (req as any).user?._id;
+      const ownerObjectId = userIdStr && Types.ObjectId.isValid(userIdStr) ? new Types.ObjectId(userIdStr) : null;
+
+      const queryConditions: any[] = [{ isPublic: true }];
+      if (ownerObjectId) {
+        queryConditions.push({ ownerId: ownerObjectId });
+        // Also match string representation if saved as string
+        queryConditions.push({ ownerId: userIdStr });
+      }
+
       const decks = await Deck.find({
-        $or: [
-          { ownerId: userId },
-          { isPublic: true, status: 'approved' },
-        ],
+        $or: queryConditions,
       }).sort({ createdAt: -1 });
 
       res.status(200).json({ success: true, data: decks });
@@ -58,13 +65,15 @@ export const deckController = {
   // POST /api/decks
   async createDeck(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id || (req as any).user?._id;
+      const userIdStr = (req as any).user?.id || (req as any).user?._id;
       const parsed = createDeckSchema.parse(req.body);
+
+      const ownerId = Types.ObjectId.isValid(userIdStr) ? new Types.ObjectId(userIdStr) : userIdStr;
 
       const newDeck = await Deck.create({
         ...parsed,
-        ownerId: userId,
-        status: parsed.isPublic ? 'approved' : 'draft',
+        ownerId,
+        status: 'approved',
         cardCount: 0,
       });
 
@@ -81,11 +90,12 @@ export const deckController = {
   // PUT /api/decks/:id
   async updateDeck(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id || (req as any).user?._id;
+      const userIdStr = (req as any).user?.id || (req as any).user?._id;
+      const ownerObjectId = userIdStr && Types.ObjectId.isValid(userIdStr) ? new Types.ObjectId(userIdStr) : userIdStr;
       const { id } = req.params;
       const parsed = updateDeckSchema.parse(req.body);
 
-      const deck = await Deck.findOne({ _id: id, ownerId: userId });
+      const deck = await Deck.findOne({ _id: id, $or: [{ ownerId: ownerObjectId }, { ownerId: userIdStr }] });
       if (!deck) {
         res.status(404).json({ success: false, error: 'Không tìm thấy bộ thẻ hoặc không có quyền chỉnh sửa' });
         return;
@@ -107,10 +117,11 @@ export const deckController = {
   // DELETE /api/decks/:id
   async deleteDeck(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id || (req as any).user?._id;
+      const userIdStr = (req as any).user?.id || (req as any).user?._id;
+      const ownerObjectId = userIdStr && Types.ObjectId.isValid(userIdStr) ? new Types.ObjectId(userIdStr) : userIdStr;
       const { id } = req.params;
 
-      const deck = await Deck.findOneAndDelete({ _id: id, ownerId: userId });
+      const deck = await Deck.findOneAndDelete({ _id: id, $or: [{ ownerId: ownerObjectId }, { ownerId: userIdStr }] });
       if (!deck) {
         res.status(404).json({ success: false, error: 'Không tìm thấy bộ thẻ hoặc không có quyền xóa' });
         return;

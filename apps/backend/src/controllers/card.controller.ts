@@ -4,7 +4,7 @@ import { Card } from '../models/Card';
 import { Deck } from '../models/Deck';
 import { UserCardState } from '../models/UserCardState';
 
-const createCardSchema = z.object({
+export const createCardSchema = z.object({
   term: z.string().min(1, 'Từ vựng không được để trống'),
   ipa: z.object({ us: z.string().optional(), uk: z.string().optional() }).optional(),
   meanings: z

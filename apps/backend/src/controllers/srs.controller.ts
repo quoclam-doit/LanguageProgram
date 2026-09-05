@@ -45,12 +45,14 @@ export const srsController = {
           const isDue = !state || state.due <= now || state.state === 'new';
           return { card, state, isDue };
         })
-        .filter((item) => item.isDue)
-        .slice(0, 30); // Max 30 cards per study session
+        .filter((item) => item.isDue);
+
+      const limitParam = req.query.limit ? parseInt(req.query.limit as string, 10) : 30;
+      const finalDueItems = limitParam > 0 ? dueItems.slice(0, limitParam) : dueItems;
 
       res.status(200).json({
         success: true,
-        data: dueItems.map((item) => ({
+        data: finalDueItems.map((item) => ({
           card: item.card,
           userState: item.state || {
             state: 'new',

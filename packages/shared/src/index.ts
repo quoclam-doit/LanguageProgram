@@ -126,6 +126,13 @@ export interface DictionaryStoreItem {
   updatedAt: string;
 }
 
+// GET /api/dictionary/lookup response — pre-shaped for the Card creation form:
+// ipa matches Card.ipa ({us,uk}), audioUrl matches Card.audioUrl (a single string).
+export interface DictionaryLookupResult {
+  ipa: { us?: string; uk?: string };
+  audioUrl?: string;
+}
+
 // Quiz & Question Types (Discriminated Union)
 export type QuestionType = 'mcq' | 'fill_blank' | 'matching' | 'listening' | 'ordering';
 

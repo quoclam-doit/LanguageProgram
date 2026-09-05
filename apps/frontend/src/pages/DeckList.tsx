@@ -118,7 +118,9 @@ export const DeckList: React.FC = () => {
         ) : (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDecks.map((deck) => {
-              const isOwner = user && (user.id === deck.ownerId || (user as any)._id === deck.ownerId);
+              const isOwner =
+                user &&
+                (String(user.id) === String(deck.ownerId) || String((user as any)._id) === String(deck.ownerId));
 
               return (
                 <motion.div
