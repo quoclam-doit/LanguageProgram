@@ -1,0 +1,10 @@
+{
+  "buildCommand": "pnpm --filter @app/shared build && pnpm --filter @app/frontend build",
+  "outputDirectory": "apps/frontend/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
